@@ -1,0 +1,26 @@
+{
+  "name": "logger4",
+  "version": "1.0.1",
+  "description": "Logger for NodeJS",
+  "main": "index.js",
+  "dependencies": {
+    "moment": "^2.24.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/peterszombati/logger4.git"
+  },
+  "keywords": [
+    "logger"
+  ],
+  "author": "Peter Szombati",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/peterszombati/logger4/issues"
+  },
+  "homepage": "https://github.com/peterszombati/logger4#readme"
+}
