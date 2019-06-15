@@ -8,6 +8,7 @@ npm i logger4
 ### Example usage
 ```ts
 // Logger.ts
+import Logger4 from 'logger4';
 export class Logger {
 	private static _log = new Logger4(path.join(process.cwd(), "logs", "log"));
 	static get log() {
