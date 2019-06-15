@@ -88,32 +88,60 @@ export class Logger4 implements Logger4Interface {
 
 	private print(log: string, tag: string, color: string, ...params: any[]) {
 		const dateStr = Utils.getMomentDateString();
-		log = this.formatLog(log, params);
+		log = params.length > 0 ? this.formatLog(log, params) : this.formatLog(log);
 		this.save(tag, dateStr, log);
 		console.log(color + dateStr + " | " + log + "\x1b[0m");
 	}
 	error(log: string, ...params: any[]) {
-		this.print(log, "ERROR", "\x1b[31m", params);
+		if (params.length === 0) {
+			this.print(log, "ERROR", "\x1b[31m");
+		} else {
+			this.print(log, "ERROR", "\x1b[31m", params);
+		}
 	}
 	warn(log: string, ...params: any[]) {
-		this.print(log, "WARN", "\x1b[33m", params);
+		if (params.length === 0) {
+			this.print(log, "WARN", "\x1b[33m");
+		} else {
+			this.print(log, "WARN", "\x1b[33m", params);
+		}
 	}
 	success(log: string, ...params: any[]) {
-		this.print(log, "SUCCESS", "\x1b[32m", params);
+		if (params.length === 0) {
+			this.print(log, "SUCCESS", "\x1b[32m");
+		} else {
+			this.print(log, "SUCCESS", "\x1b[32m", params);
+		}
 	}
 	red(log: string, ...params: any[]) {
-		this.print(log, "ERROR", "\x1b[31m", params);
+		if (params.length === 0) {
+			this.print(log, "ERROR", "\x1b[31m");
+		} else {
+			this.print(log, "ERROR", "\x1b[31m", params);
+		}
 	}
 	yellow(log: string, ...params: any[]) {
-		this.print(log, "WARN", "\x1b[33m", params);
+		if (params.length === 0) {
+			this.print(log, "WARN", "\x1b[33m");
+		} else {
+			this.print(log, "WARN", "\x1b[33m", params);
+		}
 	}
 	green(log: string, ...params: any[]) {
-		this.print(log, "SUCCESS", "\x1b[32m", params);
+		if (params.length === 0) {
+			this.print(log, "SUCCESS", "\x1b[32m");
+		} else {
+			this.print(log, "SUCCESS", "\x1b[32m", params);
+		}
 	}
 	info(log: string, ...params: any[]) {
-		this.print(log, "INFO", "", params);
+		if (params.length === 0) {
+			this.print(log, "INFO", "");
+		} else {
+			this.print(log, "INFO", "", params);
+		}
 	}
 	hidden(log: string, tag: string = "HIDDEN", ...params: any[]) {
-		this.save(tag, Utils.getMomentDateString(), this.formatLog(log, params));
+		this.save(tag, Utils.getMomentDateString(), params.length > 0 ? this.formatLog(log, params) : this.formatLog(log));
 	}
 }
