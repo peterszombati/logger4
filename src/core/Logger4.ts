@@ -5,11 +5,14 @@ import {readDirectory} from "../utils/readDirectory";
 import Utils from "../utils/Utils";
 
 export interface Logger4Interface {
-	red: (log: string) => void
-	yellow: (log: string) => void
-	green: (log: string) => void
-	info: (log: string) => void
-	hidden: (log: string, tag: string) => void
+	red: (log: string, ...params: any[]) => void
+	yellow: (log: string, ...params: any[]) => void
+	green: (log: string, ...params: any[]) => void
+	info: (log: string, ...params: any[]) => void
+	hidden: (log: string, tag: string, ...params: any[]) => void
+	error: (log: string, ...params: any[]) => void
+	warn: (log: string, ...params: any[]) => void
+	success: (log: string, ...params: any[]) => void
 }
 
 export class Logger4 implements Logger4Interface {
