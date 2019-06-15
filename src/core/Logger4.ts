@@ -74,9 +74,9 @@ export class Logger4 implements Logger4Interface {
 	}
 
 	private formatLog(log: string, ...params: any[]) {
-		if (params[0][0].length > 0) {
+		if (params.length > 0) {
 			try {
-				log += " | " + JSON.stringify(params[0][0]);
+				log += " | " + JSON.stringify(params);
 			} catch (e) {
 				this.error(e.toString());
 			}
