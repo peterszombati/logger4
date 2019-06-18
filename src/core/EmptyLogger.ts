@@ -7,7 +7,7 @@ export class EmptyLogger implements Logger4Interface {
 	yellow(log: string, ...params: any[]) { }
 	green(log: string, ...params: any[]) { }
 	info(log: string, ...params: any[]) { }
-	hidden(log: string, tag: string, ...params: any[]) { }
+	hidden(log: string, tag ?: string, type ?: string, ...params: any[]) {}
 	error(log: string, ...params: any[]) { }
 	warn(log: string, ...params: any[]) { }
 	success(log: string, ...params: any[]) { }

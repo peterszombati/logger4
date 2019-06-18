@@ -9,7 +9,7 @@ export interface Logger4Interface {
 	yellow: (log: string, ...params: any[]) => void
 	green: (log: string, ...params: any[]) => void
 	info: (log: string, ...params: any[]) => void
-	hidden: (log: string, tag: string, ...params: any[]) => void
+	hidden: (log: string, tag ?: string, type ?: string, ...params: any[]) => void
 	error: (log: string, ...params: any[]) => void
 	warn: (log: string, ...params: any[]) => void
 	success: (log: string, ...params: any[]) => void
@@ -62,12 +62,12 @@ export class Logger4 implements Logger4Interface {
 	}
 
 	private createNewFileName() {
-		this._target = path.join(this._path, moment().format('YYYY-MM-DD-HH-mm-ss') + ".txt");
+		this._target = path.join(this._path, moment().format('YYYY-MM-DD-HH-mm-ss'));
 	}
 
-	private save(type: string, dateStr: string, log: string) {
+	private save(tag: string, dateStr: string, log: string, type: string = "") {
 		try {
-			fs.appendFileSync(this._target, "\n" + dateStr + " | " + type + " | " + log);
+			fs.appendFileSync(this._target + type + ".txt", "\n" + dateStr + " | " + tag + " | " + log);
 		} catch (e) {
 
 		}
@@ -89,7 +89,7 @@ export class Logger4 implements Logger4Interface {
 	private print(log: string, tag: string, color: string, ...params: any[]) {
 		const dateStr = Utils.getMomentDateString();
 		log = params.length > 0 ? this.formatLog(log, params) : this.formatLog(log);
-		this.save(tag, dateStr, log);
+		this.save(tag, dateStr, log, "");
 		console.log(color + dateStr + " | " + log + "\x1b[0m");
 	}
 	error(log: string, ...params: any[]) {
@@ -141,7 +141,7 @@ export class Logger4 implements Logger4Interface {
 			this.print(log, "INFO", "", params);
 		}
 	}
-	hidden(log: string, tag: string = "HIDDEN", ...params: any[]) {
-		this.save(tag, Utils.getMomentDateString(), params.length > 0 ? this.formatLog(log, params) : this.formatLog(log));
+	hidden(log: string, tag: string = "HIDDEN", type: string = "",  ...params: any[]) {
+		this.save(tag, Utils.getMomentDateString(), params.length > 0 ? this.formatLog(log, params) : this.formatLog(log), type);
 	}
 }
