@@ -39,7 +39,7 @@ export class Logger4 implements Logger4Interface {
 			this._types.push(type);
 		}
 	}
-/*TODO clean directory feature
+
 	private getTimestamp(filename: string) {
 		const date = filename.split('.')[0].split('_')[0].split("-");
 		if (date.length !== 6) {
@@ -48,7 +48,7 @@ export class Logger4 implements Logger4Interface {
 		const numbers = date.map(e => parseInt(e, 10));
 		return Date.parse(`${numbers[0]}-${numbers[1]}-${numbers[2]} ${numbers[3]}:${numbers[4]}:${numbers[5]}`)
 	}
-*/
+
 	private checkLogDirectorySize() {
 		const files = readDirectory(this._path);
 		const directorySize = Utils.sum(files.map(f => f.stats.size));
@@ -56,12 +56,20 @@ export class Logger4 implements Logger4Interface {
 			const sizeInMB = Math.floor(directorySize / 1000000);
 			this.warn(`Log directory size is more than ${sizeInMB}MB (${this._path})`);
 		}
-		/*TODO clean directory feature
 		if (this._removeOverDirectorySize !== null && directorySize > 10000000000) {
+			const deleteList: string[] = [];
+			let space: number = 0;
 			files.sort((a,b) => {
 				return this.getTimestamp(a.name) > this.getTimestamp(b.name) ? 1 : -1;
+			}).some(file => {
+				space += file.stats.size;
+				deleteList.push(file.name);
+				return space > 1000000000
 			});
-		}*/
+			deleteList.forEach(fileName => {
+				fs.unlinkSync(path.join(this._path, fileName))
+			});
+		}
 	}
 
 	private checkLogFiles() {
