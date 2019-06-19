@@ -56,7 +56,7 @@ export class Logger4 implements Logger4Interface {
 			const sizeInMB = Math.floor(directorySize / 1000000);
 			this.warn(`Log directory size is more than ${sizeInMB}MB (${this._path})`);
 		}
-		if (this._removeOverDirectorySize !== null && directorySize > 10000000000) {
+		if (this._removeOverDirectorySize !== null && directorySize > this._removeOverDirectorySize) {
 			const deleteList: string[] = [];
 			let space: number = 0;
 			files.sort((a,b) => {
@@ -64,7 +64,7 @@ export class Logger4 implements Logger4Interface {
 			}).some(file => {
 				space += file.stats.size;
 				deleteList.push(file.name);
-				return space > 1000000000
+				return space > Math.floor(this._removeOverDirectorySize * 0.1)
 			});
 			deleteList.forEach(fileName => {
 				fs.unlinkSync(path.join(this._path, fileName))
