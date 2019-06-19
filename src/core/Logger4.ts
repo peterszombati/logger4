@@ -67,7 +67,8 @@ export class Logger4 implements Logger4Interface {
 				return space > Math.floor(this._removeOverDirectorySize * 0.1)
 			});
 			deleteList.forEach(fileName => {
-				fs.unlinkSync(path.join(this._path, fileName))
+				fs.unlinkSync(path.join(this._path, fileName));
+				this.warn(`Log file deleted (${path.join(this._path, fileName)})`);
 			});
 		}
 	}
