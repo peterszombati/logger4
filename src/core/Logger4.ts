@@ -13,6 +13,7 @@ export interface Logger4Interface {
 	error: (log: string, ...params: any[]) => void
 	warn: (log: string, ...params: any[]) => void
 	success: (log: string, ...params: any[]) => void
+	addType: (type: string) => void
 }
 
 export class Logger4 implements Logger4Interface {
@@ -20,21 +21,39 @@ export class Logger4 implements Logger4Interface {
 	private _target: string;
 	constructor(_path: string) {
 		this._path = _path;
+	private _types: string[] = [""];
 		this.createNewFileName();
 		this.callBeat();
-		if (fs.existsSync(_path)) {
+		if (fs.existsSync(path)) {
 			this.checkLogDirectorySize();
 		} else {
 			console.error("\n" + moment().format('YYYY-MM-DD-HH-mm-ss') + " | ERROR | " + this._path + " directory is not exits (need for LoggerId)\n");
 		}
 	}
 
+	public addType(type: string) {
+		if (this._types.includes(type) === false) {
+			this._types.push(type);
+		}
+	}
 	private checkLogDirectorySize() {
 		const directorySize = Utils.sum(readDirectory(this._path).map(f => f.stats.size));
 		if (directorySize > 250000000) {
 			const sizeInMB = Math.floor(directorySize / 1000000);
 			this.warn(`Log directory size is more than ${sizeInMB}MB (${this._path})`);
 		}
+	}
+
+	private checkLogFiles() {
+		this._types.forEach(type => {
+			if (fs.existsSync(this._target + type + ".txt") === false) {
+				return;
+			}
+			const logFileSize = fs.statSync(this._target + type + ".txt").size;
+			if (logFileSize >= 2000000) {
+				this.createNewFileName();
+			}
+		});
 	}
 
 	private beat() {
@@ -44,14 +63,7 @@ export class Logger4 implements Logger4Interface {
 		}
 
 		this.checkLogDirectorySize();
-
-		if (fs.existsSync(this._target) === false) {
-			return;
-		}
-		const logFileSize = fs.statSync(this._target).size;
-		if (logFileSize >= 2000000) {
-			this.createNewFileName();
-		}
+		this.checkLogFiles();
 	}
 
 	private callBeat() {
@@ -67,7 +79,7 @@ export class Logger4 implements Logger4Interface {
 
 	private save(tag: string, dateStr: string, log: string, type: string = "") {
 		try {
-			fs.appendFileSync(this._target + type + ".txt", "\n" + dateStr + " | " + tag + " | " + log);
+			fs.appendFileSync(this._target + (type === null ? "" : "_" + type) + ".txt", "\n" + dateStr + " | " + tag + " | " + log);
 		} catch (e) {
 
 		}
@@ -141,7 +153,7 @@ export class Logger4 implements Logger4Interface {
 			this.print(log, "INFO", "", params);
 		}
 	}
-	hidden(log: string, tag: string = "HIDDEN", type: string = "",  ...params: any[]) {
+	hidden(log: string, tag: string = "HIDDEN", type: string = null,  ...params: any[]) {
 		this.save(tag, Utils.getMomentDateString(), params.length > 0 ? this.formatLog(log, params) : this.formatLog(log), type);
 	}
 }
