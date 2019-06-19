@@ -101,7 +101,7 @@ export class Logger4 implements Logger4Interface {
 		try {
 			fs.appendFileSync(this._target + (type === null ? "" : "_" + type) + ".txt", "\n" + dateStr + " | " + tag + " | " + log);
 		} catch (e) {
-
+			//TODO: it should be handled
 		}
 	}
 
@@ -124,6 +124,7 @@ export class Logger4 implements Logger4Interface {
 		this.save(tag, dateStr, log, "");
 		console.log(color + dateStr + " | " + log + "\x1b[0m");
 	}
+
 	error(log: string, ...params: any[]) {
 		if (params.length === 0) {
 			this.print(log, "ERROR", "\x1b[31m");
