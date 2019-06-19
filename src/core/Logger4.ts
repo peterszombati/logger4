@@ -19,9 +19,12 @@ export interface Logger4Interface {
 export class Logger4 implements Logger4Interface {
 	private _path: string;
 	private _target: string;
-	constructor(_path: string) {
-		this._path = _path;
 	private _types: string[] = [""];
+	private _removeOverDirectorySize: number = null;
+
+	constructor({path, removeOverDirectorySize = null}: { path: string, removeOverDirectorySize: number | null }) {
+		this._path = path;
+		this._removeOverDirectorySize = removeOverDirectorySize;
 		this.createNewFileName();
 		this.callBeat();
 		if (fs.existsSync(path)) {
@@ -36,12 +39,29 @@ export class Logger4 implements Logger4Interface {
 			this._types.push(type);
 		}
 	}
+/*TODO clean directory feature
+	private getTimestamp(filename: string) {
+		const date = filename.split('.')[0].split('_')[0].split("-");
+		if (date.length !== 6) {
+			return null;
+		}
+		const numbers = date.map(e => parseInt(e, 10));
+		return Date.parse(`${numbers[0]}-${numbers[1]}-${numbers[2]} ${numbers[3]}:${numbers[4]}:${numbers[5]}`)
+	}
+*/
 	private checkLogDirectorySize() {
-		const directorySize = Utils.sum(readDirectory(this._path).map(f => f.stats.size));
-		if (directorySize > 250000000) {
+		const files = readDirectory(this._path);
+		const directorySize = Utils.sum(files.map(f => f.stats.size));
+		if (directorySize > 1000000000) {
 			const sizeInMB = Math.floor(directorySize / 1000000);
 			this.warn(`Log directory size is more than ${sizeInMB}MB (${this._path})`);
 		}
+		/*TODO clean directory feature
+		if (this._removeOverDirectorySize !== null && directorySize > 10000000000) {
+			files.sort((a,b) => {
+				return this.getTimestamp(a.name) > this.getTimestamp(b.name) ? 1 : -1;
+			});
+		}*/
 	}
 
 	private checkLogFiles() {
