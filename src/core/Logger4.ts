@@ -59,12 +59,13 @@ export class Logger4 implements Logger4Interface {
 		if (this._removeOverDirectorySize !== null && directorySize > this._removeOverDirectorySize) {
 			const deleteList: string[] = [];
 			let space: number = 0;
+			const minimumSpace: number = Math.floor(this._removeOverDirectorySize * 0.01);
 			files.sort((a,b) => {
 				return this.getTimestamp(a.name) > this.getTimestamp(b.name) ? 1 : -1;
 			}).some(file => {
 				space += file.stats.size;
 				deleteList.push(file.name);
-				return space > Math.floor(this._removeOverDirectorySize * 0.1)
+				return space > minimumSpace;
 			});
 			deleteList.forEach(fileName => {
 				fs.unlinkSync(path.join(this._path, fileName));
@@ -106,7 +107,7 @@ export class Logger4 implements Logger4Interface {
 		this._target = path.join(this._path, moment().format('YYYY-MM-DD-HH-mm-ss'));
 	}
 
-	private save(tag: string, dateStr: string, log: string, type: string = "") {
+	private save(tag: string, dateStr: string, log: string, type: string = null) {
 		try {
 			fs.appendFileSync(this._target + (type === null ? "" : "_" + type) + ".txt", "\n" + dateStr + " | " + tag + " | " + log);
 		} catch (e) {
@@ -130,7 +131,7 @@ export class Logger4 implements Logger4Interface {
 	private print(log: string, tag: string, color: string, ...params: any[]) {
 		const dateStr = Utils.getMomentDateString();
 		log = params.length > 0 ? this.formatLog(log, params) : this.formatLog(log);
-		this.save(tag, dateStr, log, "");
+		this.save(tag, dateStr, log, null);
 		console.log(color + dateStr + " | " + log + "\x1b[0m");
 	}
 
