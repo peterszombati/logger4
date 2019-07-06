@@ -16,16 +16,20 @@ export interface Logger4Interface {
 	addType: (type: string) => void
 }
 
+interface Target {
+	[type: string]: string
+}
+
 export class Logger4 implements Logger4Interface {
 	private _path: string;
-	private _target: string;
+	private _target: Target = { "": null };
 	private _types: string[] = [""];
 	private _removeOverDirectorySize: number = null;
 
 	constructor({path, removeOverDirectorySize = null}: { path: string, removeOverDirectorySize: number | null }) {
 		this._path = path;
 		this._removeOverDirectorySize = removeOverDirectorySize;
-		this.createNewFileName();
+		this.createNewFileName("");
 		this.callBeat();
 		if (fs.existsSync(path)) {
 			this.checkLogDirectorySize();
@@ -74,14 +78,21 @@ export class Logger4 implements Logger4Interface {
 		}
 	}
 
+	private getFileName(type: string) {
+		if (this._target[type] === undefined) {
+			this.createNewFileName(type);
+		}
+		return this._target[type] + (type === null ||type.length === 0 ? "" : "_" + type) + ".txt";
+	}
+
 	private checkLogFiles() {
 		this._types.forEach(type => {
-			if (fs.existsSync(this._target + type + ".txt") === false) {
+			if (fs.existsSync(this.getFileName(type)) === false) {
 				return;
 			}
-			const logFileSize = fs.statSync(this._target + type + ".txt").size;
+			const logFileSize = fs.statSync(this.getFileName(type)).size;
 			if (logFileSize >= 2000000) {
-				this.createNewFileName();
+				this.createNewFileName(type);
 			}
 		});
 	}
@@ -103,13 +114,13 @@ export class Logger4 implements Logger4Interface {
 		}, 600000 - (new Date().getTime() + 600000) % 600000 + 1);
 	}
 
-	private createNewFileName() {
-		this._target = path.join(this._path, moment().format('YYYY-MM-DD-HH-mm-ss'));
+	private createNewFileName(type: string) {
+		this._target[type] = path.join(this._path, moment().format('YYYY-MM-DD-HH-mm-ss'));
 	}
 
 	private save(tag: string, dateStr: string, log: string, type: string = null) {
 		try {
-			fs.appendFileSync(this._target + (type === null ? "" : "_" + type) + ".txt", "\n" + dateStr + " | " + tag + " | " + log);
+			fs.appendFileSync(this.getFileName(type), "\n" + dateStr + " | " + tag + " | " + log);
 		} catch (e) {
 			//TODO: it should be handled
 		}
