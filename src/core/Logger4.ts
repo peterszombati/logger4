@@ -79,18 +79,22 @@ export class Logger4 implements Logger4Interface {
 	}
 
 	private getFileName(type: string) {
+		if (type === null || type.length === 0) {
+			return this._target[type] + ".txt";
+		}
 		if (this._target[type] === undefined) {
 			this.createNewFileName(type);
 		}
-		return this._target[type] + (type === null ||type.length === 0 ? "" : "_" + type) + ".txt";
+		return this._target[type] + "_" + type + ".txt";
 	}
 
 	private checkLogFiles() {
 		this._types.forEach(type => {
-			if (fs.existsSync(this.getFileName(type)) === false) {
+			const fName = this.getFileName(type);
+			if (fs.existsSync(fName) === false) {
 				return;
 			}
-			const logFileSize = fs.statSync(this.getFileName(type)).size;
+			const logFileSize = fs.statSync(fName).size;
 			if (logFileSize >= 2000000) {
 				this.createNewFileName(type);
 			}
