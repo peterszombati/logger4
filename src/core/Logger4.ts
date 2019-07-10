@@ -80,7 +80,7 @@ export class Logger4 implements Logger4Interface {
 
 	private getFileName(type: string) {
 		if (type === null || type.length === 0) {
-			return this._target[type] + ".txt";
+			return this._target[""] + ".txt";
 		}
 		if (this._target[type] === undefined) {
 			this.createNewFileName(type);
