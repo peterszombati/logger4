@@ -11,6 +11,5 @@ export class EmptyLogger implements Logger4Interface {
 	error(log: string, ...params: any[]) { }
 	warn(log: string, ...params: any[]) { }
 	success(log: string, ...params: any[]) { }
-	addType(type: string) { }
 
 }

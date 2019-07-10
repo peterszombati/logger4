@@ -13,7 +13,6 @@ export interface Logger4Interface {
 	error: (log: string, ...params: any[]) => void
 	warn: (log: string, ...params: any[]) => void
 	success: (log: string, ...params: any[]) => void
-	addType: (type: string) => void
 }
 
 interface Target {
@@ -38,7 +37,7 @@ export class Logger4 implements Logger4Interface {
 		}
 	}
 
-	public addType(type: string) {
+	private addType(type: string) {
 		if (this._types.includes(type) === false) {
 			this._types.push(type);
 		}
@@ -83,6 +82,7 @@ export class Logger4 implements Logger4Interface {
 			return this._target[""] + ".txt";
 		}
 		if (this._target[type] === undefined) {
+			this.addType(type);
 			this.createNewFileName(type);
 		}
 		return this._target[type] + "_" + type + ".txt";
