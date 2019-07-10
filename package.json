@@ -1,6 +1,6 @@
 {
   "name": "logger4",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Logger for NodeJS",
   "main": "build/index.js",
   "types": "build/index.d.ts",
