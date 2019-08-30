@@ -20,16 +20,19 @@ interface Target {
 }
 
 export class Logger4 implements Logger4Interface {
-	private _path: string;
+	private _path: string | null;
 	private _target: Target = { "": null };
 	private _types: string[] = [""];
 	private _removeOverDirectorySize: number = null;
 
-	constructor({path, removeOverDirectorySize = null}: { path: string, removeOverDirectorySize: number | null }) {
+	constructor({path = null, removeOverDirectorySize = null}: { path: string | null, removeOverDirectorySize: number | null }) {
 		this._path = path;
 		this._removeOverDirectorySize = removeOverDirectorySize;
 		this.createNewFileName("");
 		this.callBeat();
+		if (this._path === null) {
+			return;
+		}
 		if (fs.existsSync(path)) {
 			this.checkLogDirectorySize();
 		} else {
@@ -53,6 +56,9 @@ export class Logger4 implements Logger4Interface {
 	}
 
 	private checkLogDirectorySize() {
+		if (this._path === null) {
+			return;
+		}
 		const files = readDirectory(this._path);
 		const directorySize = Utils.sum(files.map(f => f.stats.size));
 		if (directorySize > 1000000000) {
@@ -89,6 +95,9 @@ export class Logger4 implements Logger4Interface {
 	}
 
 	private checkLogFiles() {
+		if (this._path === null) {
+			return;
+		}
 		this._types.forEach(type => {
 			const fName = this.getFileName(type);
 			if (fs.existsSync(fName) === false) {
@@ -102,6 +111,9 @@ export class Logger4 implements Logger4Interface {
 	}
 
 	private beat() {
+		if (this._path === null) {
+			return;
+		}
 		if (fs.existsSync(this._path) === false) {
 			console.error("\n" + moment().format('YYYY-MM-DD-HH-mm-ss') + " | ERROR | " + this._path + " directory is not exits (need for LoggerId)\n");
 			return;
@@ -119,10 +131,16 @@ export class Logger4 implements Logger4Interface {
 	}
 
 	private createNewFileName(type: string) {
+		if (this._path === null) {
+			return;
+		}
 		this._target[type] = path.join(this._path, moment().format('YYYY-MM-DD-HH-mm-ss'));
 	}
 
 	private save(tag: string, dateStr: string, log: string, type: string = null) {
+		if (this._path === null) {
+			return;
+		}
 		try {
 			fs.appendFileSync(this.getFileName(type), "\n" + dateStr + " | " + tag + " | " + log);
 		} catch (e) {
