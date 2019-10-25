@@ -9,17 +9,12 @@ npm i logger4
 ```ts
 // Logger.ts
 import Logger4 from 'logger4';
-export class Logger {
-	private static _log = new Logger4(path.join(process.cwd(), "logs", "log"));
-	static get log() {
-		return this._log;
-	}
 
-	private static _empty = new EmptyLogger();
-	static get empty() {
-		return this._empty;
-	}
-}
+export let Logger = new Logger4({
+    path: path.join(process.cwd(), "log"),
+    maxDirectorySizeInMB: 3000
+});
+
 // script.ts
-Logger.log.info("Hello World");
+Logger.info("Hello World!");
 ```
