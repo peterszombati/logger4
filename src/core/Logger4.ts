@@ -23,11 +23,11 @@ export class Logger4 implements Logger4Interface {
 	private _path: string | null;
 	private _target: Target = { "": null };
 	private _types: string[] = [""];
-	private _removeOverDirectorySize: number = null;
+	private _removeOverDirectorySizeInByte: number = null;
 
-	constructor({path = null, removeOverDirectorySize = null}: { path: string | null, removeOverDirectorySize: number | null }) {
+	constructor({path = null, maxDirectorySizeInMB = null}: { path: string | null, maxDirectorySizeInMB: number | null }) {
 		this._path = path;
-		this._removeOverDirectorySize = removeOverDirectorySize;
+		this._removeOverDirectorySizeInByte = maxDirectorySizeInMB * 1000000;
 		this.createNewFileName("");
 		this.callBeat();
 		if (this._path === null) {
@@ -61,14 +61,14 @@ export class Logger4 implements Logger4Interface {
 		}
 		const files = readDirectory(this._path);
 		const directorySize = Utils.sum(files.map(f => f.stats.size));
-		if (directorySize > 1000000000) {
+		if (directorySize > 1000000 * 10000) {
 			const sizeInMB = Math.floor(directorySize / 1000000);
 			this.warn(`Log directory size is more than ${sizeInMB}MB (${this._path})`);
 		}
-		if (this._removeOverDirectorySize !== null && directorySize > this._removeOverDirectorySize) {
+		if (this._removeOverDirectorySizeInByte !== null && directorySize > this._removeOverDirectorySizeInByte) {
 			const deleteList: string[] = [];
 			let space: number = 0;
-			const minimumSpace: number = Math.floor(this._removeOverDirectorySize * 0.01);
+			const minimumSpace: number = Math.floor(this._removeOverDirectorySizeInByte * 0.01);
 			files.sort((a,b) => {
 				return this.getTimestamp(a.name) > this.getTimestamp(b.name) ? 1 : -1;
 			}).some(file => {
@@ -168,56 +168,56 @@ export class Logger4 implements Logger4Interface {
 		console.log(color + dateStr + " | " + log + "\x1b[0m");
 	}
 
-	error(log: string, ...params: any[]) {
+	public error(log: string, ...params: any[]) {
 		if (params.length === 0) {
 			this.print(log, "ERROR", "\x1b[31m");
 		} else {
 			this.print(log, "ERROR", "\x1b[31m", params);
 		}
 	}
-	warn(log: string, ...params: any[]) {
+	public warn(log: string, ...params: any[]) {
 		if (params.length === 0) {
 			this.print(log, "WARN", "\x1b[33m");
 		} else {
 			this.print(log, "WARN", "\x1b[33m", params);
 		}
 	}
-	success(log: string, ...params: any[]) {
+	public success(log: string, ...params: any[]) {
 		if (params.length === 0) {
 			this.print(log, "SUCCESS", "\x1b[32m");
 		} else {
 			this.print(log, "SUCCESS", "\x1b[32m", params);
 		}
 	}
-	red(log: string, ...params: any[]) {
+	public red(log: string, ...params: any[]) {
 		if (params.length === 0) {
 			this.print(log, "ERROR", "\x1b[31m");
 		} else {
 			this.print(log, "ERROR", "\x1b[31m", params);
 		}
 	}
-	yellow(log: string, ...params: any[]) {
+	public yellow(log: string, ...params: any[]) {
 		if (params.length === 0) {
 			this.print(log, "WARN", "\x1b[33m");
 		} else {
 			this.print(log, "WARN", "\x1b[33m", params);
 		}
 	}
-	green(log: string, ...params: any[]) {
+	public green(log: string, ...params: any[]) {
 		if (params.length === 0) {
 			this.print(log, "SUCCESS", "\x1b[32m");
 		} else {
 			this.print(log, "SUCCESS", "\x1b[32m", params);
 		}
 	}
-	info(log: string, ...params: any[]) {
+	public info(log: string, ...params: any[]) {
 		if (params.length === 0) {
 			this.print(log, "INFO", "");
 		} else {
 			this.print(log, "INFO", "", params);
 		}
 	}
-	hidden(log: string, tag: string = "HIDDEN", type: string = null,  ...params: any[]) {
+	public hidden(log: string, tag: string = "HIDDEN", type: string = null,  ...params: any[]) {
 		this.save(tag, Utils.getMomentDateString(), params.length > 0 ? this.formatLog(log, params) : this.formatLog(log), type);
 	}
 }
