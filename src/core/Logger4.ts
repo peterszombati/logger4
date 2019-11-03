@@ -12,6 +12,11 @@ export interface Logger4Interface {
 	error: (log: string, ...params: any[]) => void
 	warn: (log: string, ...params: any[]) => void
 	success: (log: string, ...params: any[]) => void
+
+	onError: (callback: (log: string, ...params: any[]) => void) => void
+	onSuccess: (callback: (log: string, ...params: any[]) => void) => void
+	onInfo: (callback: (log: string, ...params: any[]) => void) => void
+	onDebug: (callback: (log: string, ...params: any[]) => void) => void
 }
 
 interface Target {
