@@ -3,6 +3,7 @@ import * as path from 'path';
 import moment = require('moment');
 import {readDirectory} from '../utils/readDirectory';
 import Utils from '../utils/Utils';
+import {Listener} from "../modules/Listener";
 
 export interface Logger4Interface {
 	debug: (log: string, ...params: any[]) => void
@@ -17,7 +18,7 @@ interface Target {
 	[type: string]: string
 }
 
-export class Logger4 implements Logger4Interface {
+export class Logger4 extends Listener implements Logger4Interface {
 	private _path: string | null;
 	private _target: Target = { '': null };
 	private _types: string[] = [''];
@@ -25,6 +26,7 @@ export class Logger4 implements Logger4Interface {
 	private _timeout: NodeJS.Timeout | null = null;
 
 	constructor({path = null, maxDirectorySizeInMB = null}: { path: string | null, maxDirectorySizeInMB: number | null }) {
+		super();
 		this._path = path;
 		this._removeOverDirectorySizeInByte = maxDirectorySizeInMB * 1000000;
 		this.createNewFileName('');
@@ -167,19 +169,34 @@ export class Logger4 implements Logger4Interface {
 		log = params.length > 0 ? this.formatLog(log, params) : this.formatLog(log);
 		this.save(tag, dateStr, log, null);
 		console.log(color + dateStr + ' | ' + log + '\x1b[0m');
+		this.callListener(tag, [ log, ...params ]);
 	}
-
+	public onError(callback: (log: string, ...params: any[]) => void) {
+		this.addListener('ERROR', callback);
+	}
 	public error(log: string, ...params: any[]) {
 		this.print(log, 'ERROR', '\x1b[31m', params);
+	}
+	public onWarn(callback: (log: string, ...params: any[]) => void) {
+		this.addListener('WARN', callback);
 	}
 	public warn(log: string, ...params: any[]) {
 		this.print(log, 'WARN', '\x1b[33m', ...params);
 	}
+	public onSuccess(callback: (log: string, ...params: any[]) => void) {
+		this.addListener('SUCCESS', callback);
+	}
 	public success(log: string, ...params: any[]) {
 		this.print(log, 'SUCCESS', '\x1b[32m', ...params);
 	}
+	public onInfo(callback: (log: string, ...params: any[]) => void) {
+		this.addListener('INFO', callback);
+	}
 	public info(log: string, ...params: any[]) {
 		this.print(log, 'INFO', '', ...params);
+	}
+	public onDebug(callback: (log: string, ...params: any[]) => void) {
+		this.addListener('DEBUG', callback);
 	}
 	public debug(log: string, ...params: any[]) {
 		this.save('DEBUG', Utils.getMomentDateString(), params.length > 0 ? this.formatLog(log, params) : this.formatLog(log), null);
