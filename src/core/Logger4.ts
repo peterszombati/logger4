@@ -117,7 +117,6 @@ export class Logger4 implements Logger4Interface {
 			console.error('\n' + moment().format('YYYY-MM-DD-HH-mm-ss') + ' | ERROR | ' + this._path + ' directory is not exits (need for LoggerId)\n');
 			return;
 		}
-
 		this.checkLogDirectorySize();
 		this.checkLogFiles();
 	}
@@ -137,11 +136,11 @@ export class Logger4 implements Logger4Interface {
 	}
 
 	private save(tag: string, dateStr: string, log: string, type: string = null) {
-		if (this._timeout === null) {
-			this.callBeat();
-		}
 		if (this._path === null) {
 			return;
+		}
+		if (this._timeout === null) {
+			this.callBeat();
 		}
 		try {
 			fs.appendFileSync(this.getFileName(type), '\n' + dateStr + ' | ' + tag + ' | ' + log);
