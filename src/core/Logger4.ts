@@ -20,26 +20,26 @@ export interface Logger4Interface {
 }
 
 interface Target {
-	[type: string]: string
+	[type: string]: string | null
 }
 
 export class Logger4 extends Listener implements Logger4Interface {
 	private _path: string | null;
 	private _target: Target = { '': null };
 	private _types: string[] = [''];
-	private _removeOverDirectorySizeInByte: number = null;
+	private _removeOverDirectorySizeInByte: number | null = null;
 	private _timeout: NodeJS.Timeout | null = null;
 
 	constructor({path = null, maxDirectorySizeInMB = null}: { path: string | null, maxDirectorySizeInMB: number | null }) {
 		super();
 		this._path = path;
-		this._removeOverDirectorySizeInByte = maxDirectorySizeInMB * 1000000;
+		this._removeOverDirectorySizeInByte = maxDirectorySizeInMB === null ? null : maxDirectorySizeInMB * 1000000;
 		this.createNewFileName('');
 		this.callBeat();
 		if (this._path === null) {
 			return;
 		}
-		if (fs.existsSync(path)) {
+		if (fs.existsSync(this._path)) {
 			this.checkLogDirectorySize();
 		} else {
 			console.error('\n' + moment().format('YYYY-MM-DD-HH-mm-ss') + ' | ERROR | ' + this._path + ' directory is not exits (need for LoggerId)\n');
@@ -52,7 +52,7 @@ export class Logger4 extends Listener implements Logger4Interface {
 		}
 	}
 
-	private getTimestamp(filename: string) {
+	private getTimestamp(filename: string): number | null {
 		const date = filename.split('.')[0].split('_')[0].split('-');
 		if (date.length !== 6) {
 			return null;
@@ -66,6 +66,9 @@ export class Logger4 extends Listener implements Logger4Interface {
 			return;
 		}
 		const files = readDirectory(this._path);
+		if (files === null) {
+			return;
+		}
 		const directorySize = Utils.sum(files.map(f => f.stats.size));
 		if (directorySize > 1000000 * 10000) {
 			const sizeInMB = Math.floor(directorySize / 1000000);
@@ -76,20 +79,27 @@ export class Logger4 extends Listener implements Logger4Interface {
 			let space: number = 0;
 			const minimumSpace: number = Math.floor(this._removeOverDirectorySizeInByte * 0.01);
 			files.sort((a,b) => {
-				return this.getTimestamp(a.name) > this.getTimestamp(b.name) ? 1 : -1;
+				const a1 = this.getTimestamp(a.name);
+				const b1 = this.getTimestamp(b.name);
+				if (a1 === null || b1 === null) {
+					return 0;
+				}
+				return a1 > b1 ? 1 : -1;
 			}).some(file => {
 				space += file.stats.size;
 				deleteList.push(file.name);
 				return space > minimumSpace;
 			});
 			deleteList.forEach(fileName => {
-				fs.unlinkSync(path.join(this._path, fileName));
-				this.warn(`Log file deleted (${path.join(this._path, fileName)})`);
+				if (this._path !== null) {
+					fs.unlinkSync(path.join(this._path, fileName));
+					this.warn(`Log file deleted (${path.join(this._path, fileName)})`);
+				}
 			});
 		}
 	}
 
-	private getFileName(type: string) {
+	private getFileName(type: string | null) {
 		if (type === null || type.length === 0) {
 			return this._target[''] + '.txt';
 		}
@@ -142,7 +152,7 @@ export class Logger4 extends Listener implements Logger4Interface {
 		this._target[type] = path.join(this._path, moment().format('YYYY-MM-DD-HH-mm-ss'));
 	}
 
-	private save(tag: string, dateStr: string, log: string, type: string = null) {
+	private save(tag: string, dateStr: string, log: string, type: string | null = null) {
 		if (this._path === null) {
 			return;
 		}
@@ -206,7 +216,7 @@ export class Logger4 extends Listener implements Logger4Interface {
 	public debug(log: string, ...params: any[]) {
 		this.save('DEBUG', Utils.getMomentDateString(), params.length > 0 ? this.formatLog(log, params) : this.formatLog(log), null);
 	}
-	public hidden(log: string, tag: string = 'HIDDEN', type: string = null,  ...params: any[]) {
+	public hidden(log: string, tag: string = 'HIDDEN', type: string | null = null,  ...params: any[]) {
 		this.save(tag, Utils.getMomentDateString(), params.length > 0 ? this.formatLog(log, params) : this.formatLog(log), type);
 	}
 }
