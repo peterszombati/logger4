@@ -17,6 +17,7 @@ export interface Logger4Interface {
 	onSuccess: (callback: (log: string, ...params: any[]) => void) => void
 	onInfo: (callback: (log: string, ...params: any[]) => void) => void
 	onDebug: (callback: (log: string, ...params: any[]) => void) => void
+	on: (tag: string, callback: (log: string, ...params: any[]) => void) => void
 }
 
 interface Target {
@@ -131,7 +132,7 @@ export class Logger4 extends Listener implements Logger4Interface {
 			return;
 		}
 		if (fs.existsSync(this._path) === false) {
-			console.error('\n' + moment().format('YYYY-MM-DD-HH-mm-ss') + ' | ERROR | ' + this._path + ' directory is not exits (need for LoggerId)\n');
+			console.error('\n' + moment().format('YYYY-MM-DD-HH-mm-ss') + ' | ERROR | ' + this._path + ' directory is not exits (need for Logger4)\n');
 			return;
 		}
 		this.checkLogDirectorySize();
@@ -181,42 +182,47 @@ export class Logger4 extends Listener implements Logger4Interface {
 
 	private print(log: string, tag: string, color: string, ...params: any[]) {
 		const dateStr = Utils.getMomentDateString();
-		log = params.length > 0 ? this.formatLog(log, params) : this.formatLog(log);
+		log = params.length > 0 ? this.formatLog(log, ...params) : this.formatLog(log);
 		this.save(tag, dateStr, log, null);
 		console.log(color + dateStr + ' | ' + log + '\x1b[0m');
 		this.callListener(tag, [ log, ...params ]);
 	}
+	public on(tag: string, callback: (log: string, ...params: any[]) => void) {
+		this.addListener(tag, callback);
+	}
 	public onError(callback: (log: string, ...params: any[]) => void) {
-		this.addListener('ERROR', callback);
+		this.on('ERROR', callback);
 	}
 	public error(log: string, ...params: any[]) {
 		this.print(log, 'ERROR', '\x1b[31m', params);
 	}
 	public onWarn(callback: (log: string, ...params: any[]) => void) {
-		this.addListener('WARN', callback);
+		this.on('WARN', callback);
 	}
 	public warn(log: string, ...params: any[]) {
 		this.print(log, 'WARN', '\x1b[33m', ...params);
 	}
 	public onSuccess(callback: (log: string, ...params: any[]) => void) {
-		this.addListener('SUCCESS', callback);
+		this.on('SUCCESS', callback);
 	}
 	public success(log: string, ...params: any[]) {
 		this.print(log, 'SUCCESS', '\x1b[32m', ...params);
 	}
 	public onInfo(callback: (log: string, ...params: any[]) => void) {
-		this.addListener('INFO', callback);
+		this.on('INFO', callback);
 	}
 	public info(log: string, ...params: any[]) {
 		this.print(log, 'INFO', '', ...params);
 	}
 	public onDebug(callback: (log: string, ...params: any[]) => void) {
-		this.addListener('DEBUG', callback);
+		this.on('DEBUG', callback);
 	}
 	public debug(log: string, ...params: any[]) {
-		this.save('DEBUG', Utils.getMomentDateString(), params.length > 0 ? this.formatLog(log, params) : this.formatLog(log), null);
+		this.save('DEBUG', Utils.getMomentDateString(), params.length > 0 ? this.formatLog(log, ...params) : this.formatLog(log), null);
+		this.callListener('DEBUG', [ log, ...params ]);
 	}
 	public hidden(log: string, tag: string = 'HIDDEN', type: string | null = null,  ...params: any[]) {
-		this.save(tag, Utils.getMomentDateString(), params.length > 0 ? this.formatLog(log, params) : this.formatLog(log), type);
+		this.save(tag, Utils.getMomentDateString(), params.length > 0 ? this.formatLog(log, ...params) : this.formatLog(log), type);
+		this.callListener(tag, [ log, ...params ]);
 	}
 }
