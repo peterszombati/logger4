@@ -194,7 +194,7 @@ export class Logger4 extends Listener implements Logger4Interface {
 		this.on('ERROR', callback);
 	}
 	public error(log: string, ...params: any[]) {
-		this.print(log, 'ERROR', '\x1b[31m', params);
+		this.print(log, 'ERROR', '\x1b[31m', ...params);
 	}
 	public onWarn(callback: (log: string, ...params: any[]) => void) {
 		this.on('WARN', callback);
