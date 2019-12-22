@@ -37,13 +37,12 @@ export class Logger4 extends Listener implements Logger4Interface {
 		this._removeOverDirectorySizeInByte = maxDirectorySizeInMB === null ? null : maxDirectorySizeInMB * 1000000;
 		this.createNewFileName('');
 		this.callBeat();
-		if (this._path === null) {
-			return;
-		}
-		if (fs.existsSync(this._path)) {
-			this.checkLogDirectorySize();
-		} else {
-			console.error('\n' + moment().format('YYYY-MM-DD-HH-mm-ss') + ' | ERROR | ' + this._path + ' directory is not exits (need for LoggerId)\n');
+		if (this._path !== null) {
+			if (fs.existsSync(this._path)) {
+				this.checkLogDirectorySize();
+			} else {
+				console.error('\n' + moment().format('YYYY-MM-DD-HH-mm-ss') + ' | ERROR | ' + this._path + ' directory is not exits (need for LoggerId)\n');
+			}
 		}
 	}
 
@@ -55,11 +54,12 @@ export class Logger4 extends Listener implements Logger4Interface {
 
 	private getTimestamp(filename: string): number | null {
 		const date = filename.split('.')[0].split('_')[0].split('-');
-		if (date.length !== 6) {
+		if (date.length === 6) {
+			const numbers = date.map(e => parseInt(e, 10));
+			return Date.parse(`${numbers[0]}-${numbers[1]}-${numbers[2]} ${numbers[3]}:${numbers[4]}:${numbers[5]}`)
+		} else {
 			return null;
 		}
-		const numbers = date.map(e => parseInt(e, 10));
-		return Date.parse(`${numbers[0]}-${numbers[1]}-${numbers[2]} ${numbers[3]}:${numbers[4]}:${numbers[5]}`)
 	}
 
 	private checkLogDirectorySize() {
@@ -133,10 +133,10 @@ export class Logger4 extends Listener implements Logger4Interface {
 		}
 		if (fs.existsSync(this._path) === false) {
 			console.error('\n' + moment().format('YYYY-MM-DD-HH-mm-ss') + ' | ERROR | ' + this._path + ' directory is not exits (need for Logger4)\n');
-			return;
+		} else {
+			this.checkLogDirectorySize();
+			this.checkLogFiles();
 		}
-		this.checkLogDirectorySize();
-		this.checkLogFiles();
 	}
 
 	private callBeat() {
@@ -147,23 +147,21 @@ export class Logger4 extends Listener implements Logger4Interface {
 	}
 
 	private createNewFileName(type: string) {
-		if (this._path === null) {
-			return;
+		if (this._path !== null) {
+			this._target[type] = path.join(this._path, moment().format('YYYY-MM-DD-HH-mm-ss'));
 		}
-		this._target[type] = path.join(this._path, moment().format('YYYY-MM-DD-HH-mm-ss'));
 	}
 
 	private save(tag: string, dateStr: string, log: string, type: string | null = null) {
-		if (this._path === null) {
-			return;
-		}
-		if (this._timeout === null) {
-			this.callBeat();
-		}
-		try {
-			fs.appendFileSync(this.getFileName(type), '\n' + dateStr + ' | ' + tag + ' | ' + log);
-		} catch (e) {
-			console.error(e);
+		if (this._path !== null) {
+			if (this._timeout === null) {
+				this.callBeat();
+			}
+			try {
+				fs.appendFileSync(this.getFileName(type), '\n' + dateStr + ' | ' + tag + ' | ' + log);
+			} catch (e) {
+				console.error(e);
+			}
 		}
 	}
 
