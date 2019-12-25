@@ -1,6 +1,7 @@
 export class Listener {
 
-	constructor() {}
+	constructor() {
+	}
 
 	private _listeners: any = {};
 
@@ -9,25 +10,31 @@ export class Listener {
 	}
 
 	public addListener(listenerId: string, callBack: any, key: string | null = null) {
-		if (typeof(callBack) !== "function") {
+		if (typeof (callBack) !== 'function') {
 			return;
 		}
 		if (this._listeners[listenerId] === undefined) {
 			this._listeners[listenerId] = {};
 		}
-		if (key === null) {
-			key = "g" + Object.keys(this._listeners[listenerId]).length;
-			this._listeners[listenerId][key] = callBack;
-		} else {
-			this._listeners[listenerId]["s" + key] = callBack;
-		}
+		key = key === null
+			? 'g' + Object.keys(this._listeners[listenerId]).length
+			: 's' + key;
+		this._listeners[listenerId][key] = callBack;
 	}
 
 	public callListener(listenerId: string, params: any[] = []) {
+		let errors: any[] = [];
 		if (this._listeners[listenerId] !== undefined) {
 			Object.keys(this._listeners[listenerId]).forEach((key: string) => {
-				this._listeners[listenerId][key](...params);
+				try {
+					this._listeners[listenerId][key](...params);
+				} catch (e) {
+					errors.push(e);
+				}
 			});
+		}
+		if (errors.length > 0) {
+			throw errors[0];
 		}
 	}
 
