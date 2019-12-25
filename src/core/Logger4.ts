@@ -93,11 +93,18 @@ export class Logger4 extends Listener implements Logger4Interface {
 			});
 			deleteList.forEach(fileName => {
 				if (this._path !== null) {
-					fs.unlinkSync(path.join(this._path, fileName));
-					this.warn(`Log file deleted (${path.join(this._path, fileName)})`);
+					const file = path.join(this._path, fileName);
+					if (this.callListener('onDeleteLog', [file]).every(({enabled}) => enabled !== false)) {
+						fs.unlinkSync(file);
+						this.warn(`Log file deleted (${file})`);
+					}
 				}
 			});
 		}
+	}
+
+	public onDeleteLog(callback: (file: string) => { enabled: boolean}) {
+		this.addListener('onDeleteLog', callback);
 	}
 
 	private getFileName(type: string | null) {
@@ -112,30 +119,27 @@ export class Logger4 extends Listener implements Logger4Interface {
 	}
 
 	private checkLogFiles() {
-		if (this._path === null) {
-			return;
+		if (this._path !== null) {
+			this._types.forEach(type => {
+				const fName = this.getFileName(type);
+				if (fs.existsSync(fName)) {
+					const logFileSize = fs.statSync(fName).size;
+					if (logFileSize >= 2000000) {
+						this.createNewFileName(type);
+					}
+				}
+			});
 		}
-		this._types.forEach(type => {
-			const fName = this.getFileName(type);
-			if (fs.existsSync(fName) === false) {
-				return;
-			}
-			const logFileSize = fs.statSync(fName).size;
-			if (logFileSize >= 2000000) {
-				this.createNewFileName(type);
-			}
-		});
 	}
 
 	private beat() {
-		if (this._path === null) {
-			return;
-		}
-		if (fs.existsSync(this._path) === false) {
-			console.error('\n' + moment().format('YYYY-MM-DD-HH-mm-ss') + ' | ERROR | ' + this._path + ' directory is not exits (need for Logger4)\n');
-		} else {
-			this.checkLogDirectorySize();
-			this.checkLogFiles();
+		if (this._path !== null) {
+			if (fs.existsSync(this._path) === false) {
+				console.error('\n' + moment().format('YYYY-MM-DD-HH-mm-ss') + ' | ERROR | ' + this._path + ' directory is not exits (need for Logger4)\n');
+			} else {
+				this.checkLogDirectorySize();
+				this.checkLogFiles();
+			}
 		}
 	}
 
@@ -183,44 +187,44 @@ export class Logger4 extends Listener implements Logger4Interface {
 		log = params.length > 0 ? this.formatLog(log, ...params) : this.formatLog(log);
 		this.save(tag, dateStr, log, null);
 		console.log(color + dateStr + ' | ' + log + '\x1b[0m');
-		this.callListener(tag, [ log, ...params ]);
+		this.callListener(tag, [ log, null, ...params ]);
 	}
-	public on(tag: string, callback: (log: string, ...params: any[]) => void) {
+	public on(tag: string, callback: (log: string, type: string | null, ...params: any[]) => void) {
 		this.addListener(tag, callback);
 	}
-	public onError(callback: (log: string, ...params: any[]) => void) {
+	public onError(callback: (log: string, type: string | null, ...params: any[]) => void) {
 		this.on('ERROR', callback);
 	}
 	public error(log: string, ...params: any[]) {
 		this.print(log, 'ERROR', '\x1b[31m', ...params);
 	}
-	public onWarn(callback: (log: string, ...params: any[]) => void) {
+	public onWarn(callback: (log: string, type: string | null, ...params: any[]) => void) {
 		this.on('WARN', callback);
 	}
 	public warn(log: string, ...params: any[]) {
 		this.print(log, 'WARN', '\x1b[33m', ...params);
 	}
-	public onSuccess(callback: (log: string, ...params: any[]) => void) {
+	public onSuccess(callback: (log: string, type: string | null, ...params: any[]) => void) {
 		this.on('SUCCESS', callback);
 	}
 	public success(log: string, ...params: any[]) {
 		this.print(log, 'SUCCESS', '\x1b[32m', ...params);
 	}
-	public onInfo(callback: (log: string, ...params: any[]) => void) {
+	public onInfo(callback: (log: string, type: string | null, ...params: any[]) => void) {
 		this.on('INFO', callback);
 	}
 	public info(log: string, ...params: any[]) {
 		this.print(log, 'INFO', '', ...params);
 	}
-	public onDebug(callback: (log: string, ...params: any[]) => void) {
+	public onDebug(callback: (log: string, type: string | null, ...params: any[]) => void) {
 		this.on('DEBUG', callback);
 	}
 	public debug(log: string, ...params: any[]) {
 		this.save('DEBUG', Utils.getMomentDateString(), params.length > 0 ? this.formatLog(log, ...params) : this.formatLog(log), null);
-		this.callListener('DEBUG', [ log, ...params ]);
+		this.callListener('DEBUG', [ log, null, ...params ]);
 	}
 	public hidden(log: string, tag: string = 'HIDDEN', type: string | null = null,  ...params: any[]) {
 		this.save(tag, Utils.getMomentDateString(), params.length > 0 ? this.formatLog(log, ...params) : this.formatLog(log), type);
-		this.callListener(tag, [ log, ...params ]);
+		this.callListener(tag, [ log, type, ...params ]);
 	}
 }
