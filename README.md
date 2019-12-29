@@ -11,10 +11,10 @@ npm i logger4
 import Logger4 from 'logger4';
 
 export let Logger = new Logger4({
-    path: path.join(process.cwd(), "log"),
-    maxDirectorySizeInMB: 3000
+    path: path.join(process.cwd(), 'log'),
+    directorySizeLimitMB: 3000
 });
 
 // script.ts
-Logger.info("Hello World!");
+Logger.info('Hello World!');
 ```
