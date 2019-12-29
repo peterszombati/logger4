@@ -28,17 +28,17 @@ export class Logger4 extends Listener implements Logger4Interface {
 	private _path: string | null;
 	private _target: Target = { '': null };
 	private _types: string[] = [''];
-	private _removeOverDirectorySizeInByte: number | null = null;
+	private _directorySizeLimitMB: number | null = null;
 	private _timeout: NodeJS.Timeout | null = null;
 
 	public get path() {
 		return this._path;
 	}
 
-	constructor({path = null, maxDirectorySizeInMB = null}: { path: string | null, maxDirectorySizeInMB: number | null }) {
+	constructor({path = null, directorySizeLimitMB = null}: { path: string | null, directorySizeLimitMB: number | null }) {
 		super();
 		this._path = path;
-		this._removeOverDirectorySizeInByte = maxDirectorySizeInMB === null ? null : maxDirectorySizeInMB * 1000000;
+		this._directorySizeLimitMB = directorySizeLimitMB === null ? null : directorySizeLimitMB * 1000000;
 		this.createNewFileName('');
 		this.callBeat();
 		if (this._path !== null) {
@@ -79,10 +79,10 @@ export class Logger4 extends Listener implements Logger4Interface {
 			const sizeInMB = Math.floor(directorySize / 1000000);
 			this.warn(`Log directory size is more than ${sizeInMB}MB (${this._path})`);
 		}
-		if (this._removeOverDirectorySizeInByte !== null && directorySize > this._removeOverDirectorySizeInByte) {
+		if (this._directorySizeLimitMB !== null && directorySize > this._directorySizeLimitMB) {
 			const deleteList: string[] = [];
 			let space: number = 0;
-			const minimumSpace: number = Math.floor(this._removeOverDirectorySizeInByte * 0.01);
+			const minimumSpace: number = Math.floor(this._directorySizeLimitMB * 0.01);
 			files.sort((a,b) => {
 				const a1 = this.getTimestamp(a.name);
 				const b1 = this.getTimestamp(b.name);
