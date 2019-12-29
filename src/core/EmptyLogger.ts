@@ -1,8 +1,9 @@
-import {Logger4Interface} from "./Logger4";
+import {Logger4Interface} from './Logger4';
 
 export class EmptyLogger implements Logger4Interface {
 	constructor() {}
 
+	path: string | null = null;
 	debug(log: string, ...params: any[]) { }
 	info(log: string, ...params: any[]) { }
 	hidden(log: string, tag ?: string, type ?: string, ...params: any[]) { }

@@ -3,9 +3,10 @@ import * as path from 'path';
 import moment = require('moment');
 import {readDirectory} from '../utils/readDirectory';
 import Utils from '../utils/Utils';
-import {Listener} from "../modules/Listener";
+import {Listener} from '../modules/Listener';
 
 export interface Logger4Interface {
+	path: string | null
 	debug: (log: string, ...params: any[]) => void
 	info: (log: string, ...params: any[]) => void
 	hidden: (log: string, tag ?: string, type ?: string, ...params: any[]) => void
