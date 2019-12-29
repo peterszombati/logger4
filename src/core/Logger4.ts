@@ -31,6 +31,10 @@ export class Logger4 extends Listener implements Logger4Interface {
 	private _removeOverDirectorySizeInByte: number | null = null;
 	private _timeout: NodeJS.Timeout | null = null;
 
+	public get path() {
+		return this._path;
+	}
+
 	constructor({path = null, maxDirectorySizeInMB = null}: { path: string | null, maxDirectorySizeInMB: number | null }) {
 		super();
 		this._path = path;
@@ -134,11 +138,11 @@ export class Logger4 extends Listener implements Logger4Interface {
 
 	private beat() {
 		if (this._path !== null) {
-			if (fs.existsSync(this._path) === false) {
-				console.error('\n' + moment().format('YYYY-MM-DD-HH-mm-ss') + ' | ERROR | ' + this._path + ' directory is not exits (need for Logger4)\n');
-			} else {
+			if (fs.existsSync(this._path)) {
 				this.checkLogDirectorySize();
 				this.checkLogFiles();
+			} else {
+				console.error('\n' + moment().format('YYYY-MM-DD-HH-mm-ss') + ' | ERROR | ' + this._path + ' directory is not exits (need for Logger4)\n');
 			}
 		}
 	}
