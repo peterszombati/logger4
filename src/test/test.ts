@@ -3,6 +3,7 @@ import {Logger4} from '../core/Logger4';
 import * as path from 'path';
 
 export let Logger = new Logger4({
+    printEnabled: true,
     path: path.join(process.cwd(), 'log'),
     directorySizeLimitMB: 3000
 });
