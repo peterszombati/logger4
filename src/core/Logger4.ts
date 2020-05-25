@@ -18,7 +18,7 @@ export interface Logger4Interface {
 	onInfo: (callback: (log: string, ...params: any[]) => void) => void
 	onDebug: (callback: (log: string, ...params: any[]) => void) => void
 	onTag: (tag: string, callback: (log: string, ...params: any[]) => void) => void
-	on: (callback: (log: string, ...params: any[]) => void) => void
+	on: (callback: (tag: string, log: string, ...params: any[]) => void) => void
 }
 
 interface Target {
