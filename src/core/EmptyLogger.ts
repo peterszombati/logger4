@@ -15,5 +15,6 @@ export class EmptyLogger implements Logger4Interface {
 	onSuccess(callback: (log: string, ...params: any[]) => void) { }
 	onInfo(callback: (log: string, ...params: any[]) => void) { }
 	onDebug(callback: (log: string, ...params: any[]) => void) { }
-	on(tag: string, callback: (log: string, ...params: any[]) => void) { }
+	onTag(tag: string, callback: (log: string, ...params: any[]) => void) { }
+	on(callback: (tag: string, log: string, ...params: any[]) => void) { }
 }
