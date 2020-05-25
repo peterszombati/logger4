@@ -17,8 +17,8 @@ export interface Logger4Interface {
 	onSuccess: (callback: (log: string, ...params: any[]) => void) => void
 	onInfo: (callback: (log: string, ...params: any[]) => void) => void
 	onDebug: (callback: (log: string, ...params: any[]) => void) => void
-	onTag: (tag: string, callback: (log: string, ...params: any[]) => void) => void
-	on: (callback: (tag: string, log: string, ...params: any[]) => void) => void
+	onTag: (tag: string, callback: (log: string, type: string | null, ...params: any[]) => void) => void
+	on: (callback: (tag: string, log: string, type: string | null, ...params: any[]) => void) => void
 }
 
 interface Target {
@@ -261,5 +261,6 @@ export class Logger4 extends Listener implements Logger4Interface {
 	public hidden(log: string, tag: string = 'HIDDEN', type: string | null = null,  ...params: any[]) {
 		this.save(tag, Utils.getMomentDateTimeString(), params.length > 0 ? this.formatLog(log, ...params) : this.formatLog(log), type);
 		this.callListener('TAG_'+tag, [ log, type, ...params ]);
+		this.callListener('ALLTAG', [ tag, log, type, ...params ]);
 	}
 }
