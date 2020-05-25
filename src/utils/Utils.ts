@@ -1,5 +1,3 @@
-import moment = require('moment');
-
 class Utils {
 
 	static sum(numbers: number[]) {

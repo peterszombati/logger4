@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import moment = require('moment');
 import {readDirectory} from '../utils/readDirectory';
 import Utils from '../utils/Utils';
 import {Listener} from '../modules/Listener';
