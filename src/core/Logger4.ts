@@ -179,7 +179,7 @@ export class Logger4 extends Listener implements Logger4Interface {
 			try {
 				fs.appendFileSync(this.getFileName(type), '\n' + dateStr + ' | ' + tag + ' | ' + log);
 			} catch (e) {
-				this.loggerError(e);
+				this.loggerError(e, false, true);
 			}
 		}
 	}
@@ -201,11 +201,13 @@ export class Logger4 extends Listener implements Logger4Interface {
 		}
 	}
 
-	private loggerError(error: any, noFormat: boolean = false) {
+	private loggerError(error: any, noFormat: boolean = false, noSave: boolean = false) {
 		const tag = 'ERROR';
 		const log = noFormat ? error.toString() : this.formatLog(error);
 		const dateStr = Utils.getMomentDateTimeString();
-		this.save(tag, dateStr, log, null);
+		if (!noSave) {
+			this.save(tag, dateStr, log, null);
+		}
 		console.log('\x1b[31m' + dateStr + ' | ' + log + '\x1b[0m');
 		this.callListener('TAG_'+tag, [ log, null ]);
 		this.callListener('ALLTAG', [ tag, log, null ]);
