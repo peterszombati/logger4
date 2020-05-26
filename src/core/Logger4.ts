@@ -167,7 +167,7 @@ export class Logger4 extends Listener implements Logger4Interface {
 
 	private createNewFileName(type: string) {
 		if (this._path !== null) {
-			this._target[type] = path.join(this._path, Utils.getMomentDateTimeString());
+			this._target[type] = path.join(this._path, Utils.getMomentDateTimeStringFile());
 		}
 	}
 
