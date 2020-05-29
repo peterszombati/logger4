@@ -1,6 +1,6 @@
 # logger4
 
-### Install via npm
+### Install via [npm](https://www.npmjs.com/package/logger4)
 ```
 npm i logger4
 ```
