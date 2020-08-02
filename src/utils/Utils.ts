@@ -16,7 +16,7 @@ class Utils {
 			month = `0${  month}`;
 		}
 		if (date < 10) {
-			month = `0${  date}`;
+			date = `0${  date}`;
 		}
 		let HH: number | string = d.getUTCHours();
 		let mm: number | string = d.getUTCMinutes();
@@ -43,7 +43,7 @@ class Utils {
 			month = `0${  month}`;
 		}
 		if (date < 10) {
-			month = `0${  date}`;
+			date = `0${  date}`;
 		}
 		let HH: number | string = d.getUTCHours();
 		let mm: number | string = d.getUTCMinutes();
