@@ -32,27 +32,31 @@ export class Logger4 extends Listener implements Logger4Interface {
     private _directorySizeLimitMB: number | null = null;
     private _timeout: any = null;
     private _printEnabled: boolean = true;
+    private _savingEnabled: boolean = true;
 
     public get path() {
         return this._path;
     }
 
     constructor({
+                    savingEnabled = true,
                     printEnabled = true,
                     path = null,
                     directorySizeLimitMB = null
                 }: {
-        printEnabled: boolean
-        path: string | null,
-        directorySizeLimitMB: number | null
+        savingEnabled?: boolean
+        printEnabled?: boolean
+        path?: string | null,
+        directorySizeLimitMB?: number | null
     }) {
         super();
+        this._savingEnabled = savingEnabled;
         this._printEnabled = printEnabled;
         this._path = path;
         this._directorySizeLimitMB = directorySizeLimitMB === null ? null : directorySizeLimitMB * 1000000;
         this.createNewFileName('');
         this.callBeat();
-        if (this._path !== null) {
+        if (this._path !== null && savingEnabled) {
             if (fs.existsSync(this._path)) {
                 this.checkLogDirectorySize();
             } else {
@@ -148,7 +152,7 @@ export class Logger4 extends Listener implements Logger4Interface {
     }
 
     private beat() {
-        if (this._path !== null) {
+        if (this._path !== null && this._savingEnabled) {
             if (fs.existsSync(this._path)) {
                 this.checkLogDirectorySize();
                 this.checkLogFiles();
@@ -166,13 +170,13 @@ export class Logger4 extends Listener implements Logger4Interface {
     }
 
     private createNewFileName(type: string) {
-        if (this._path !== null) {
+        if (this._path !== null && this._savingEnabled) {
             this._target[type] = path.join(this._path, Utils.getMomentDateTimeStringFile());
         }
     }
 
     private save(tag: string, dateStr: string, log: string, type: string | null = null) {
-        if (this._path !== null) {
+        if (this._path !== null && this._savingEnabled) {
             if (this._timeout === null) {
                 this.callBeat();
             }

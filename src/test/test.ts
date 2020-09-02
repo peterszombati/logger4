@@ -5,7 +5,8 @@ import * as path from 'path';
 export let Logger = new Logger4({
     printEnabled: true,
     path: path.join(process.cwd(), 'log'),
-    directorySizeLimitMB: 3000
+    directorySizeLimitMB: 3000,
+    savingEnabled: true
 });
 
 // script.ts
