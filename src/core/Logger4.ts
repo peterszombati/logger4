@@ -1,8 +1,7 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import {readDirectory} from '../utils/readDirectory';
-import Utils from '../utils/Utils';
-import {Listener} from '../modules/Listener';
+import {readDirectory} from '../utils/readDirectory'
+import Utils from '../utils/Utils'
+import {Listener} from '../modules/Listener'
+import {isNodeJS} from '../utils/isNodeJS'
 
 export interface Logger4Interface {
     path: string | null
@@ -57,6 +56,10 @@ export class Logger4 extends Listener implements Logger4Interface {
         this.createNewFileName('');
         this.callBeat();
         if (this._path !== null && savingEnabled) {
+            if (!isNodeJS()) {
+                throw new Error('savingEnabled should be false on frontend side')
+            }
+            const fs = require('fs')
             if (fs.existsSync(this._path)) {
                 this.checkLogDirectorySize();
             } else {
@@ -85,6 +88,12 @@ export class Logger4 extends Listener implements Logger4Interface {
         if (this._path === null) {
             return;
         }
+        if (!isNodeJS()) {
+            throw new Error('path should be null on frontend side')
+        }
+        const fs = require('fs')
+        const path = require('path')
+
         const files = readDirectory(this._path);
         if (files === null) {
             return;
@@ -139,6 +148,11 @@ export class Logger4 extends Listener implements Logger4Interface {
 
     private checkLogFiles() {
         if (this._path !== null) {
+            if (!isNodeJS()) {
+                throw new Error('path should be null on frontend side')
+            }
+            const fs = require('fs')
+
             this._types.forEach(type => {
                 const fName = this.getFileName(type);
                 if (fs.existsSync(fName)) {
@@ -153,6 +167,11 @@ export class Logger4 extends Listener implements Logger4Interface {
 
     private beat() {
         if (this._path !== null && this._savingEnabled) {
+            if (!isNodeJS()) {
+                throw new Error('path should be null on frontend side')
+            }
+            const fs = require('fs')
+
             if (fs.existsSync(this._path)) {
                 this.checkLogDirectorySize();
                 this.checkLogFiles();
@@ -171,12 +190,22 @@ export class Logger4 extends Listener implements Logger4Interface {
 
     private createNewFileName(type: string) {
         if (this._path !== null && this._savingEnabled) {
+            if (!isNodeJS()) {
+                throw new Error('path should be null on frontend side')
+            }
+            const path = require('path')
+
             this._target[type] = path.join(this._path, Utils.getMomentDateTimeStringFile());
         }
     }
 
     private save(tag: string, dateStr: string, log: string, type: string | null = null) {
         if (this._path !== null && this._savingEnabled) {
+            if (!isNodeJS()) {
+                throw new Error('path should be null on frontend side')
+            }
+            const fs = require('fs')
+
             if (this._timeout === null) {
                 this.callBeat();
             }
