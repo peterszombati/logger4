@@ -132,7 +132,7 @@ export class Logger4 extends Listener implements Logger4Interface {
     }
 
     public onDeleteLog(callback: (file: string) => { enabled: boolean }) {
-        this.addListener('onDeleteLog', callback);
+        return this.addListener('onDeleteLog', callback);
     }
 
     private getFileName(type: string | null) {
@@ -262,15 +262,15 @@ export class Logger4 extends Listener implements Logger4Interface {
     }
 
     public onTag(tag: string, callback: (log: string, type: string | null, ...params: any[]) => void) {
-        this.addListener('TAG_' + tag, callback);
+        return this.addListener('TAG_' + tag, callback);
     }
 
     public on(callback: (tag: string, log: string, type: string | null, ...params: any[]) => void) {
-        this.addListener('ALLTAG', callback);
+        return this.addListener('ALLTAG', callback);
     }
 
     public onError(callback: (log: string, type: string | null, ...params: any[]) => void) {
-        this.onTag('ERROR', callback);
+        return this.onTag('ERROR', callback);
     }
 
     public error(log: string, ...params: any[]) {
@@ -278,7 +278,7 @@ export class Logger4 extends Listener implements Logger4Interface {
     }
 
     public onWarn(callback: (log: string, type: string | null, ...params: any[]) => void) {
-        this.onTag('WARN', callback);
+        return this.onTag('WARN', callback);
     }
 
     public warn(log: string, ...params: any[]) {
@@ -286,7 +286,7 @@ export class Logger4 extends Listener implements Logger4Interface {
     }
 
     public onSuccess(callback: (log: string, type: string | null, ...params: any[]) => void) {
-        this.onTag('SUCCESS', callback);
+        return this.onTag('SUCCESS', callback);
     }
 
     public success(log: string, ...params: any[]) {
@@ -294,7 +294,7 @@ export class Logger4 extends Listener implements Logger4Interface {
     }
 
     public onInfo(callback: (log: string, type: string | null, ...params: any[]) => void) {
-        this.onTag('INFO', callback);
+        return this.onTag('INFO', callback);
     }
 
     public info(log: string, ...params: any[]) {
@@ -302,7 +302,7 @@ export class Logger4 extends Listener implements Logger4Interface {
     }
 
     public onDebug(callback: (log: string, type: string | null, ...params: any[]) => void) {
-        this.onTag('DEBUG', callback);
+        return this.onTag('DEBUG', callback);
     }
 
     public debug(log: string, ...params: any[]) {
