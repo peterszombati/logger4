@@ -1,4 +1,4 @@
-import {Logger4Interface} from './Logger4';
+import {Logger4Interface} from './Logger4'
 
 export class EmptyLogger implements Logger4Interface {
 	constructor() {}

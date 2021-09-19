@@ -1,7 +1,7 @@
-import {readDirectory} from '../utils/readDirectory'
-import Utils from '../utils/Utils'
-import {Listener} from '../modules/Listener'
-import {isNodeJS} from '../utils/isNodeJS'
+import {readDirectory} from '../../utils/readDirectory'
+import Utils from '../../utils/Utils'
+import {Listener} from '../../modules/Listener'
+import {isNodeJS} from '../../utils/isNodeJS'
 
 export interface Logger4Interface {
     path: string | null
