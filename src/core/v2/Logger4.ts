@@ -54,7 +54,7 @@ export class Logger4V2 extends Listener implements Logger4InterfaceV2 {
   private log(code: ParsedError, tag: string, log: string, ...params: any[]) {
     this.push(tag, this.params.log(code, tag, log, ...params))
     try {
-      this.callListener('onLog', [code, tag, log, ...params])
+      this.callListener(`onLog_${tag}`, [code, tag, log, ...params])
     } catch (e) {
       console.error(this.params.error(code, e))
     }
@@ -91,8 +91,8 @@ export class Logger4V2 extends Listener implements Logger4InterfaceV2 {
     return this.log(parseError(new Error('')), 'success', log, ...params)
   }
 
-  onLog(callback: (code: ParsedError, tag: string, log: string, ...params: any[]) => void) {
-    return this.addListener('onLog', callback)
+  onLog(tag: string, callback: (code: ParsedError, tag: string, log: string, ...params: any[]) => void) {
+    return this.addListener(`onLog_${tag}`, callback)
   }
 
   onError(callback: (code: ParsedError, error: ParsedError, ...params: any[]) => void) {
