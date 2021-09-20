@@ -9,6 +9,8 @@ function notNull<TValue>(value: TValue | null): value is TValue {
 export type ParsedError = { message: string, stack: string[], cwd: string }
 
 const cwd = process.cwd()
+const pattern1 = new RegExp(escapeRegExp(cwd), 'g')
+const pattern2 = new RegExp('%{cwd}(\\\\|[a-z]|[A-Z]|[0-9]|\\.|:|_)+(:[0-9]+)(:[0-9]+)', 'g')
 
 export function parseError(e: Error): ParsedError {
   if (!e.stack) {
@@ -19,12 +21,11 @@ export function parseError(e: Error): ParsedError {
     }
   }
 
-  const pattern = new RegExp(escapeRegExp(cwd), 'g')
-  const lines: string[] = e.stack.replace(pattern, '%{cwd}').split(/\r?\n/)
+  const lines: string[] = e.stack.replace(pattern1, '%{cwd}').split(/\r?\n/)
   return {
     message: e.message,
     stack: lines
-      .map(i => i.match(new RegExp('%{cwd}(\\\\|[a-z]|[A-Z]|[0-9]|\\.|:|_)+(:[0-9]+)(:[0-9]+)', 'g')))
+      .map(i => i.match(pattern2))
       .filter(notNull)
       .flat(),
     cwd,
