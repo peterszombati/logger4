@@ -53,7 +53,11 @@ export class Logger4V2 extends Listener implements Logger4InterfaceV2 {
 
   private log(code: ParsedError, tag: string, log: string, ...params: any[]) {
     this.push(tag, this.params.log(code, tag, log, ...params))
-    this.callListener('onLog', [code, tag, log, ...params])
+    try {
+      this.callListener('onLog', [code, tag, log, ...params])
+    } catch (e) {
+      console.error(this.params.error(code, e))
+    }
   }
 
   debug(log: string, ...params: any[]) {
@@ -72,7 +76,11 @@ export class Logger4V2 extends Listener implements Logger4InterfaceV2 {
     const code = parseError(new Error(''))
     const e = parseError(error)
     this.push('error', this.params.error(code, e, ...params))
-    this.callListener('onError', [code, e, ...params])
+    try {
+      this.callListener('onError', [code, e, ...params])
+    } catch (e) {
+      console.error(this.params.error(code, e))
+    }
   }
 
   warn(log: string, ...params: any[]) {
