@@ -22,6 +22,6 @@ export class EmptyLoggerV2 implements Logger4InterfaceV2 {
   success() {
   }
 
-  on() {
+  onStream() {
   }
 }

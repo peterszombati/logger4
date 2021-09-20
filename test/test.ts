@@ -19,10 +19,11 @@ describe('sandbox', () => {
   it('#1: V2 test', async () => {
     const logger = new Logger4V2()
     const info = new Writable()
+
     info._write = ((chunk, encoding, callback) => {
       console.log(chunk.toString())
     })
-    logger.on('info', info)
+    logger.onStream('info', info)
     logger.info('asd')
   })
 })

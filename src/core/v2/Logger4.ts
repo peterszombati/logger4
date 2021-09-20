@@ -9,7 +9,7 @@ export interface Logger4InterfaceV2 {
   error: (error: Error, ...params: any[]) => void
   warn: (log: string, ...params: any[]) => void
   success: (log: string, ...params: any[]) => void
-  on: (tag: string, stream: Writable) => void
+  onStream: (tag: string, stream: Writable) => void
 }
 
 type Streams = Record<string, {
@@ -53,6 +53,7 @@ export class Logger4V2 extends Listener implements Logger4InterfaceV2 {
 
   private log(code: ParsedError, tag: string, log: string, ...params: any[]) {
     this.push(tag, this.params.log(code, tag, log, ...params))
+    this.callListener('onLog', [code, tag, log, ...params])
   }
 
   debug(log: string, ...params: any[]) {
@@ -71,6 +72,7 @@ export class Logger4V2 extends Listener implements Logger4InterfaceV2 {
     const code = parseError(new Error(''))
     const e = parseError(error)
     this.push('error', this.params.error(code, e, ...params))
+    this.callListener('onError', [code, e, ...params])
   }
 
   warn(log: string, ...params: any[]) {
@@ -81,7 +83,15 @@ export class Logger4V2 extends Listener implements Logger4InterfaceV2 {
     return this.log(parseError(new Error('')), 'success', log, ...params)
   }
 
-  on(tag: string, writable: Writable) {
+  onLog(callback: (code: ParsedError, tag: string, log: string, ...params: any[]) => void) {
+    return this.addListener('onLog', callback)
+  }
+
+  onError(callback: (code: ParsedError, error: ParsedError, ...params: any[]) => void) {
+    return this.addListener('onError', callback)
+  }
+
+  onStream(tag: string, writable: Writable) {
     if (!this.streams[tag]) {
       this.streams[tag] = {
         id: -1,
