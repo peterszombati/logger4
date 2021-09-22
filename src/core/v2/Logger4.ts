@@ -10,6 +10,7 @@ export interface Logger4InterfaceV2 {
   warn: (log: string, ...params: any[]) => void
   success: (log: string, ...params: any[]) => void
   onStream: (tag: string, stream: Writable) => void
+  print: (tag: string, log: string) => void
 }
 
 type Streams = Record<string, {
@@ -97,6 +98,14 @@ export class Logger4V2 extends Listener implements Logger4InterfaceV2 {
 
   onError(callback: (code: ParsedError, error: ParsedError, ...params: any[]) => void) {
     return this.addListener('onError', callback)
+  }
+
+  print(tag: string, log: string) {
+    if (this.streams[tag]) {
+      for (const [id, writable] of Object.entries(this.streams[tag].streams)) {
+        writable.write(log)
+      }
+    }
   }
 
   onStream(tag: string, writable: Writable) {
