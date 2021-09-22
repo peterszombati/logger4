@@ -1,7 +1,7 @@
 import * as path from 'path'
-import Logger4 from '../build'
-import {Logger4V2} from "../src";
+import Logger4, {Logger4V2} from "../src";
 import {Writable} from "stream";
+import {JsonError} from "../src/utils/JsonError";
 
 describe('sandbox', () => {
   it('#0: V1 test', async () => {
@@ -28,7 +28,7 @@ describe('sandbox', () => {
       console.error(chunk.toString())
     })
     logger.onStream('error', error)
-    logger.info('asd')
-    logger.error(new Error('error_message'))
+    logger.info('test')
+    logger.error(new JsonError('error_message', {key: 'value'}))
   })
 })
