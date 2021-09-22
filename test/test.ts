@@ -1,7 +1,7 @@
 import * as path from 'path'
-import Logger4, {Logger4V2} from "../src";
-import {Writable} from "stream";
-import {JsonError} from "../src/utils/JsonError";
+import Logger4, {Logger4V2} from '../src'
+import {Writable} from 'stream'
+import {JsonError} from '../src'
 
 describe('sandbox', () => {
   it('#0: V1 test', async () => {
