@@ -30,7 +30,10 @@ export class Logger4V2 extends Listener implements Logger4InterfaceV2 {
       return `${new Date().toISOString()};${tag};${code.stack[1]};${log}${params.length > 0 ? ';' + JSON.stringify({params}) : ''}`
     },
     error: (code: ParsedError, error: ParsedError, ...params: any[]) => {
-      return `${new Date().toISOString()};error;${code.stack[1]};${error.message};${JSON.stringify({stack:error.stack})}${params.length > 0 ? ';' + JSON.stringify({params}) : ''}`
+      return `${new Date().toISOString()};error;${code.stack[1]};${error.message};${JSON.stringify({
+        stack: error.stack,
+        params: error.params
+      })}${params.length > 0 ? ';' + JSON.stringify({params}) : ''}`
     },
   }
 
@@ -123,7 +126,7 @@ export class Logger4V2 extends Listener implements Logger4InterfaceV2 {
         console.error(e)
       }
     })
-    writable.once('finish',() => {
+    writable.once('finish', () => {
       if (this.streams[tag].streams['_' + id]) {
         delete this.streams[tag].streams['_' + id]
       }

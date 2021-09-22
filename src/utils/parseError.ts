@@ -1,3 +1,5 @@
+import {isObject} from './isObject'
+
 function escapeRegExp(string: string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
@@ -6,7 +8,7 @@ function notNull<TValue>(value: TValue | null): value is TValue {
   return value !== null
 }
 
-export type ParsedError = { message: string, stack: string[], cwd: string }
+export type ParsedError = { message: string, stack: string[], cwd: string, params: any }
 
 const cwd = process.cwd()
 const pattern1 = new RegExp(escapeRegExp(cwd), 'g')
@@ -14,10 +16,40 @@ const pattern2 = new RegExp('%{cwd}(\\\\|[a-z]|[A-Z]|[0-9]|\\.|:|_)+(:[0-9]+)(:[
 
 export function parseError(e: Error): ParsedError {
   if (!e.stack) {
-    return {
-      message: typeof e === 'string' ? e : '',
-      stack: [],
-      cwd,
+    if (typeof e === 'string') {
+      return {
+        message: e,
+        stack: [],
+        cwd,
+        params: undefined,
+      }
+    }
+    if (e instanceof Error) {
+      return {
+        message: e.message,
+        stack: [],
+        cwd,
+        // @ts-ignore
+        params: isObject(e.params) ? e.params : undefined
+      }
+    }
+    try {
+      return {
+        // @ts-ignore
+        message: isObject(e) ? '' : JSON.stringify(e),
+        stack: [],
+        cwd,
+        // @ts-ignore
+        params: isObject(e) ? e : undefined
+      }
+    } catch (e) {
+      return {
+        message: '',
+        stack: [],
+        cwd,
+        // @ts-ignore
+        params: isObject(e) ? e : undefined
+      }
     }
   }
 
@@ -29,5 +61,7 @@ export function parseError(e: Error): ParsedError {
       .filter(notNull)
       .flat(),
     cwd,
+    // @ts-ignore
+    params: isObject(e.params) ? e.params : undefined
   }
 }
