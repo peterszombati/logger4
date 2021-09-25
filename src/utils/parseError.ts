@@ -12,7 +12,7 @@ export type ParsedError = { message: string, stack: string[], cwd: string, param
 
 const cwd = process.cwd()
 const pattern1 = new RegExp(escapeRegExp(cwd), 'g')
-const pattern2 = new RegExp('({%cwd})(.+?)(?=:[0-9]+:[0-9]+)(:[0-9]+)(:[0-9]+)', 'g')
+const pattern2 = new RegExp('(%{cwd})(.+?)(?=:[0-9]+:[0-9]+)(:[0-9]+)(:[0-9]+)', 'g')
 
 export function parseError(e: Error): ParsedError {
   if (!e.stack) {
