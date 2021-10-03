@@ -9,6 +9,7 @@ export interface Logger4InterfaceV2 {
   error: (error: Error, ...params: any[]) => void
   warn: (log: string, ...params: any[]) => void
   success: (log: string, ...params: any[]) => void
+  track: (...params: any[]) => void
   onStream: (tag: string, stream: Writable) => void
   print: (tag: string, log: string) => void
 }
@@ -62,6 +63,10 @@ export class Logger4V2 extends Listener implements Logger4InterfaceV2 {
     } catch (e) {
       console.error(this.params.error(code, e))
     }
+  }
+
+  track(...params: any) {
+    return this.push('track', `${new Date().toISOString()};${JSON.stringify(parseError(new Error('')).stack.slice(1,3))};${params.length > 0 ? JSON.stringify(params) : ''}`)
   }
 
   debug(log: string, ...params: any[]) {
