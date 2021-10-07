@@ -1,9 +1,10 @@
 import {isObject} from './isObject'
 import {parseStack} from './parseStack'
+import {isNodeJS} from './isNodeJS'
 
 export type ParsedError = { message: string, stack: string[], cwd: string, params: any }
 
-const cwd = process.cwd()
+const cwd = isNodeJS() ? process.cwd() : ''
 
 export function parseError(e: Error): ParsedError {
   if (!e.stack) {
